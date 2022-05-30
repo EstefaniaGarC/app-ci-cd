@@ -1,0 +1,21 @@
+name: CD Develop
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  format-and-test:
+    uses: EstefaniaGarC/app-ci-cd/.github/workflows/ci.yml
+  deploy-develop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: build
+        run: npm run build
+      - name: deploy to staging
+        # using 'npx' we install and run surge in one line
+        run: |
+          npx surge --project ./build --domain nonstop-grain.surge.sh
+        env:
+          SURGE_LOGIN: ${{SURGE_LOGIN}}
+          SURGE_TOKEN: ${{SURGE_TOKEN}}
