@@ -1,13 +1,16 @@
-name: CD Main
+name: CD Release
 
 on:
   push:
-    branches: [main]
+    branches-ignore:
+      - "**"
+    tags:
+      - "v*"
 
 jobs:
   format-and-test:
     uses: ./.github/workflows/ci.yml
-  deploy-main:
+  deploy-after-release:
     needs: format-and-test
     runs-on: ubuntu-latest
     steps:
@@ -19,13 +22,7 @@ jobs:
         run: npm ci
       - name: build
         run: npm run build
-      - name: create release
-        run: npx semantic-release
-        env:
-          # token automatically generated for us in github actions
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: deploy to prod
-        # using 'npx' we install and run surge in one line
         run: |
           npx surge --project ./build --domain nonstop-grain.surge.sh
         env:
